@@ -1,0 +1,39 @@
+.notice-form-card { margin-bottom: var(--space-7); }
+.notice-form-title { margin-bottom: var(--space-4); font-size: var(--text-lg); }
+
+.notice-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.notice-form-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.notice-form-type,
+.notice-form-date {
+  flex: 1;
+  min-width: 160px;
+}
+
+.notice-form-mention-label {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-2);
+}
+
+.notice-form-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.existing-notices-heading { margin-bottom: var(--space-3); }
+
+@media (max-width: 420px) {
+  .notice-form-type, .notice-form-date { min-width: 100%; }
+  .notice-form-actions { flex-direction: column; }
+  .notice-form-actions .btn { width: 100%; }
+}

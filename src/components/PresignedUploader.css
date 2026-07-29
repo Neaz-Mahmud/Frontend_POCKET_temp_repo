@@ -1,0 +1,163 @@
+/* ── Drop zone ─────────────────────────────────────────────
+   The dashed well warms toward the brand colour on hover, so
+   the whole area reads as one large target rather than just
+   the label text inside it. */
+.uploader-container {
+  background-color: var(--paper-dim);
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  transition: border-color var(--dur-base) var(--ease), background-color var(--dur-base) var(--ease);
+}
+
+.uploader-container:hover {
+  border-color: var(--brand-border);
+  background-color: var(--brand-soft);
+}
+
+.upload-box { width: 100%; }
+.file-input-hidden { display: none; }
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--muted);
+  cursor: pointer;
+  padding: var(--space-7);
+  transition: color var(--dur-base) var(--ease);
+  font-weight: 600;
+  font-size: var(--text-base);
+  text-align: center;
+}
+
+.upload-label:hover { color: var(--brand); }
+
+/* Circular tile behind the upload glyph */
+.upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--brand);
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease);
+}
+
+.upload-label:hover .upload-icon {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-soft);
+}
+
+.uploads-list {
+  width: 100%;
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.selected-file {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+}
+
+.selected-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.file-info { display: flex; align-items: baseline; gap: var(--space-2); min-width: 0; flex: 1; }
+
+.upload-done-label {
+  color: var(--success);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: var(--text-base);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size { color: var(--muted); font-size: var(--text-xs); flex-shrink: 0; }
+
+.clear-btn {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  padding: 2px;
+  transition: color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+.clear-btn:hover { color: var(--danger); background-color: var(--danger-bg); }
+
+.upload-error { color: var(--danger); font-size: var(--text-base); text-align: center; }
+
+/* ── Progress ──────────────────────────────────────────────
+   A moving sheen on the fill signals that the transfer is live,
+   not just a bar that happens to be part-way across. */
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: var(--paper-sunken);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  margin-top: var(--space-1);
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--brand-grad);
+  transition: width var(--dur-base) var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: progress-sheen 1.2s linear infinite;
+}
+
+@keyframes progress-sheen {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.progress-text {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  text-align: center;
+  display: block;
+  margin-top: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.upload-btn { width: 100%; }

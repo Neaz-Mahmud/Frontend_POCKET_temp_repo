@@ -1,0 +1,87 @@
+.calendar { padding: var(--space-5); }
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.calendar-header h3 { font-size: var(--text-lg); }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.calendar-daynames {
+  margin-bottom: var(--space-2);
+}
+
+.calendar-daynames span {
+  text-align: center;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+
+.calendar-cell.empty { visibility: hidden; }
+
+.calendar-cell:not(:disabled):hover { background-color: var(--paper-sunken); }
+
+/* Today is outlined; a selected day is filled. Both can be true at
+   once, and the filled state has to win visually. */
+.calendar-cell.today {
+  box-shadow: inset 0 0 0 1.5px var(--brand);
+  color: var(--brand);
+}
+
+.calendar-cell.marked {
+  color: var(--pastel-rose-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.calendar-cell.marked:hover { background-color: var(--pastel-rose); transform: scale(1.06); }
+
+.calendar-cell.selected {
+  background-color: var(--brand);
+  color: var(--brand-contrast) !important;
+  box-shadow: 0 2px 8px -2px var(--brand-ring);
+}
+
+.calendar-dot {
+  position: absolute;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--pastel-rose-ink);
+}
+
+.calendar-cell.selected .calendar-dot { background-color: var(--brand-contrast); }
+
+@media (max-width: 380px) {
+  .calendar { padding: var(--space-4) var(--space-3); }
+  .calendar-grid { gap: 2px; }
+  .calendar-cell { font-size: var(--text-sm); }
+  .calendar-daynames span { font-size: 0.62rem; }
+}

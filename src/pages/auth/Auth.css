@@ -1,0 +1,269 @@
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--paper);
+}
+
+/* ── Visual panel ──────────────────────────────────────────
+   A layered gradient mesh over the brand purple, with a faint
+   grid on top. Gives the sign-in screen real presence instead
+   of a flat pastel block, and needs no image asset to do it. */
+.auth-visual {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-12);
+  position: relative;
+  overflow: hidden;
+  background-color: #1c1533;
+  color: #fff;
+  isolation: isolate;
+}
+
+.auth-visual::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: -2;
+  background:
+    radial-gradient(50% 55% at 18% 18%, rgba(139, 92, 246, 0.75), transparent 60%),
+    radial-gradient(45% 50% at 82% 28%, rgba(56, 132, 209, 0.55), transparent 62%),
+    radial-gradient(55% 55% at 62% 88%, rgba(217, 106, 173, 0.45), transparent 60%),
+    radial-gradient(40% 45% at 8% 82%, rgba(72, 199, 158, 0.35), transparent 60%);
+  filter: blur(12px);
+  animation: mesh-drift 24s var(--ease) infinite alternate;
+}
+
+/* Fine grid, masked so it fades out toward the lower right —
+   keeps the panel from reading as a plain gradient. */
+.auth-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(70% 70% at 30% 25%, #000 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(70% 70% at 30% 25%, #000 20%, transparent 80%);
+}
+
+@keyframes mesh-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(3%, -3%, 0) scale(1.12); }
+}
+
+.auth-visual-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.auth-visual-mark {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.auth-visual-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) 0;
+}
+
+.auth-visual-image img {
+  max-width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.35));
+  animation: hero-float 7s ease-in-out infinite alternate;
+}
+
+/* The global dark-mode img dimming would mute the hero here,
+   where it already sits on a dark panel by design. */
+[data-theme='dark'] .auth-visual-image img { filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.45)); }
+
+@keyframes hero-float {
+  from { transform: translateY(-6px); }
+  to { transform: translateY(6px); }
+}
+
+.auth-visual-copy h1 {
+  font-size: var(--text-3xl);
+  max-width: 15ch;
+  margin-bottom: var(--space-3);
+  color: #fff;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+}
+
+.auth-visual-copy p {
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 46ch;
+  font-size: var(--text-md);
+  line-height: 1.6;
+}
+
+/* Small glass chips summarising what the product does. */
+.auth-visual-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.auth-visual-point {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.auth-visual-point svg { opacity: 0.8; }
+
+/* ── Form panel ────────────────────────────────────────────*/
+.auth-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10);
+  min-width: 380px;
+  background-color: var(--paper);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  animation: auth-in var(--dur-slow) var(--ease);
+}
+
+@keyframes auth-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Brand lockup above the form — only shown once the visual
+   panel is hidden on narrow screens, so the page keeps its
+   identity when the artwork is gone. */
+.auth-mobile-brand {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.auth-mobile-brand .auth-visual-mark {
+  background: var(--brand-grad);
+  border: none;
+  box-shadow: 0 2px 8px -1px var(--brand-ring);
+}
+
+.auth-title {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-2);
+}
+
+.auth-subtitle {
+  color: var(--muted);
+  margin-bottom: var(--space-8);
+  font-size: var(--text-md);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ── Role toggle ───────────────────────────────────────────
+   Segmented control. The active pill is a real element behind
+   the labels so it can slide between the two options. */
+.role-toggle {
+  display: flex;
+  gap: var(--space-1);
+  background-color: var(--paper-sunken);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-full);
+  padding: 4px;
+}
+
+.role-toggle button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  text-align: center;
+  transition: color var(--dur-fast) var(--ease), background-color var(--dur-base) var(--ease),
+              box-shadow var(--dur-base) var(--ease);
+}
+
+.role-toggle button:hover:not(.active) { color: var(--ink); }
+
+.role-toggle button.active {
+  background-color: var(--brand);
+  color: var(--brand-contrast);
+  box-shadow: 0 2px 6px -1px var(--brand-ring);
+}
+
+.auth-submit {
+  margin-top: var(--space-2);
+  padding: 0.8rem;
+  font-size: var(--text-md);
+  width: 100%;
+}
+
+.auth-footer {
+  margin-top: var(--space-7);
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--muted);
+}
+
+.auth-footer a { font-weight: 700; color: var(--brand); }
+.auth-footer a:hover { color: var(--brand-strong); }
+
+@media (max-width: 880px) {
+  .auth-visual { display: none; }
+  .auth-container { min-width: 0; padding: var(--space-6); }
+  .auth-mobile-brand { display: flex; }
+}

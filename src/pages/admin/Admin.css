@@ -1,0 +1,110 @@
+/* ── Admin dashboard stat grid ───────────────────────────── */
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+.admin-stat {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: border-color var(--dur-base) var(--ease), transform var(--dur-base) var(--ease),
+              box-shadow var(--dur-base) var(--ease);
+}
+.admin-stat.is-link { cursor: pointer; }
+.admin-stat.is-link:hover { border-color: var(--line-strong); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.admin-stat-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.admin-stat-icon {
+  width: 38px; height: 38px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--brand-soft); color: var(--brand);
+}
+.admin-stat-value {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.admin-stat-label { font-size: var(--text-sm); color: var(--muted); font-weight: 600; }
+.admin-stat.is-alert .admin-stat-icon { background: var(--pastel-butter); color: var(--pastel-butter-ink); }
+.admin-stat.is-alert .admin-stat-value { color: var(--pastel-butter-ink); }
+
+/* ── Verification review cards ───────────────────────────── */
+.verify-list { display: flex; flex-direction: column; gap: var(--space-4); }
+.verify-card { padding: var(--space-5); }
+.verify-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+.verify-card-title { font-size: var(--text-lg); letter-spacing: -0.015em; margin-bottom: 2px; }
+.verify-card-sub { font-size: var(--text-sm); color: var(--muted); }
+.verify-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+.verify-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.verify-meta-key { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+.verify-meta-val { font-size: var(--text-base); color: var(--ink); font-weight: 600; word-break: break-word; }
+
+.verify-docs { display: flex; gap: var(--space-3); flex-wrap: wrap; margin: var(--space-4) 0; }
+.verify-doc {
+  display: block;
+  width: 160px; height: 108px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--paper-sunken);
+  position: relative;
+}
+.verify-doc img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-base) var(--ease); }
+.verify-doc:hover img { transform: scale(1.04); }
+.verify-doc-label {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: rgba(23, 22, 20, 0.72); color: #fff;
+  font-size: var(--text-xs); font-weight: 600;
+  padding: 3px 8px;
+}
+.verify-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-3); }
+
+/* ── Admin data rows (users / sections) ──────────────────── */
+.admin-toolbar { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; margin-bottom: var(--space-5); }
+.admin-search { flex: 1; min-width: 220px; }
+
+.admin-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: 700;
+  border: 1px solid transparent;
+}
+.admin-badge.verified { background: var(--pastel-mint); color: var(--pastel-mint-ink); }
+.admin-badge.pending { background: var(--brand-soft); color: var(--brand); }
+.admin-badge.unverified, .admin-badge.rejected { background: var(--danger-bg); color: var(--danger); }
+.admin-badge.role-admin { background: var(--pastel-lilac, var(--brand-soft)); color: var(--pastel-lilac-ink, var(--brand)); }
+.admin-badge.role-teacher { background: var(--pastel-sky, var(--brand-soft)); color: var(--pastel-sky-ink, var(--brand)); }
+.admin-badge.role-student { background: var(--paper-sunken); color: var(--ink-soft); }
+
+.admin-pager { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin-top: var(--space-5); }
+
+/* ── Verification tabs ───────────────────────────────────── */
+.admin-tabs { display: flex; gap: var(--space-1); margin-bottom: var(--space-5); border-bottom: 1px solid var(--line); }
+.admin-tab {
+  padding: 0.55rem 0.9rem;
+  font-size: var(--text-base); font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.admin-tab:hover { color: var(--ink); }
+.admin-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+.admin-empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-5);
+  color: var(--muted);
+}
+.admin-empty svg { color: var(--line-strong); margin-bottom: var(--space-3); }

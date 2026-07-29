@@ -1,0 +1,324 @@
+/* ── Quick actions row ─────────────────────────────────── */
+.quick-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.quick-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--line-strong);
+  background-color: var(--paper);
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: var(--text-base);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.quick-action-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.quick-action-btn.active {
+  background-color: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-contrast);
+  box-shadow: 0 2px 6px -1px var(--brand-ring);
+}
+
+.quick-action-btn .chev {
+  transition: transform var(--dur-base) var(--ease);
+  margin-left: var(--space-1);
+}
+
+.quick-action-btn.active .chev { transform: rotate(180deg); }
+
+/* ── Action panels (join / create / request admin) ─────────
+   These open in response to a click, so they animate in to
+   connect the panel to the button that revealed it. */
+.action-panel {
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  animation: panel-in var(--dur-base) var(--ease);
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.action-panel-hint {
+  font-size: var(--text-base);
+  margin: calc(var(--space-1) * -1) 0 0;
+}
+
+.inline-form {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.inline-form input { flex: 1; min-width: 200px; }
+
+@media (max-width: 420px) {
+  .inline-form input { min-width: 100%; }
+  .inline-form button { width: 100%; }
+}
+
+.stacked-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── CR Tools callout (student "My Sections" page) ─────────── */
+.cr-tools-callout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.85rem 1rem;
+  margin: var(--space-1) 0 var(--space-7);
+  background-color: var(--pastel-sky);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: inherit;
+  transition: box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+}
+.cr-tools-callout:hover {
+  text-decoration: none;
+  box-shadow: var(--shadow-pop);
+  transform: translateY(-2px);
+}
+
+.cr-tools-callout:hover .cr-tools-callout-arrow { transform: translateX(3px); }
+
+.cr-tools-callout-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--paper);
+  color: var(--pastel-sky-ink);
+}
+
+.cr-tools-callout-text { flex: 1; min-width: 0; }
+.cr-tools-callout-title { font-weight: 700; font-size: var(--text-base); color: var(--pastel-sky-ink); }
+.cr-tools-callout-sub { font-size: var(--text-sm); color: var(--pastel-sky-ink); opacity: 0.85; margin-top: 1px; }
+.cr-tools-callout-arrow {
+  color: var(--pastel-sky-ink);
+  flex-shrink: 0;
+  transition: transform var(--dur-base) var(--ease);
+}
+
+/* ── CR Tools page banner ──────────────────────────────────── */
+.cr-tools-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  line-height: 1.55;
+}
+.cr-tools-banner svg { flex-shrink: 0; margin-top: 2px; }
+
+/* ── Section list heading ─────────────────────────────────── */
+.section-list-heading {
+  margin: var(--space-8) 0 var(--space-3);
+  font-size: var(--text-lg);
+}
+
+/* ── Section cards ─────────────────────────────────────────── */
+.section-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section-card {
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease),
+              transform var(--dur-base) var(--ease);
+}
+
+.section-card.is-invited {
+  border-left: 3px solid var(--pastel-sky-ink);
+  background-color: var(--pastel-sky);
+}
+
+/* Admin sections are links to their dedicated page */
+.section-card-link {
+  display: block;
+  color: inherit;
+}
+.section-card-link:hover {
+  text-decoration: none;
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-pop);
+  transform: translateY(-2px);
+}
+
+.section-card-link:hover .section-card-chevron { transform: translateX(3px); color: var(--brand); }
+
+.section-card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.8rem 1rem;
+  text-align: left;
+  background: none;
+}
+
+.section-card-header-static { cursor: default; }
+
+/* Right-hand cluster: unread count, role badge, leave button and
+   chevron. Grouping them lets the group claim the free space once,
+   instead of each child pushing itself over with auto margins. */
+.section-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.section-card-leave {
+  padding: 4px;
+  color: var(--muted);
+}
+.section-card-leave:hover { color: var(--danger); background-color: var(--danger-bg); }
+
+.section-card-chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
+}
+
+/* Accept / reject pair on an invitation card */
+.section-invite-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .section-card-header { flex-wrap: wrap; }
+  .section-card-meta { margin-left: auto; }
+  .section-invite-actions { width: 100%; justify-content: flex-end; margin-top: var(--space-2); }
+}
+
+/* ── CR tool sub-nav (used on the dedicated admin page) ─ */
+.cr-tool-row {
+  display: flex;
+  gap: var(--space-1);
+  margin: var(--space-4) 0 var(--space-5);
+  flex-wrap: wrap;
+}
+
+.cr-tool-row-page {
+  margin-top: var(--space-2);
+}
+
+.cr-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+  background-color: var(--paper-dim);
+  border: 1px solid transparent;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.cr-tool-btn:hover { color: var(--ink); background-color: var(--paper-sunken); }
+
+.cr-tool-btn.active {
+  background-color: var(--brand-soft);
+  color: var(--brand);
+  border-color: var(--brand-border);
+}
+
+.cr-tool-content { padding-top: var(--space-1); }
+
+/* ── Dedicated section admin page header ──────────────────── */
+.section-admin-back {
+  margin-bottom: var(--space-4);
+  padding-left: var(--space-1);
+}
+
+.section-admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* Identity block on a Section's own page: a large colour-coded avatar
+   beside the name, so opening "CSE 8B" feels like walking into your class's
+   own space rather than a generic settings screen. */
+.section-admin-identity {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.section-admin-avatar {
+  width: 52px;
+  height: 52px;
+  font-size: var(--text-xl);
+  font-family: var(--font-display);
+  box-shadow: var(--shadow-soft);
+}
+
+/* The join code doubles as a copy-to-clipboard button */
+.section-admin-code {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-family: var(--font-sans);
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.section-admin-code:hover {
+  color: var(--brand);
+  border-color: var(--brand-border);
+  background-color: var(--brand-soft);
+}
+
+@media (max-width: 640px) {
+  .quick-actions { flex-direction: column; }
+  .quick-action-btn { justify-content: space-between; }
+
+  .section-admin-header { flex-direction: column; }
+}
