@@ -43,7 +43,7 @@ const NoticeCard = ({ notice, showSection = false, canManage = false, onEdit, on
         {canManage && (
           <div className="notice-actions">
             <button className="btn btn-ghost btn-sm" onClick={() => onEdit(notice)}>Edit</button>
-            <button className="btn btn-danger btn-sm" onClick={() => onDelete(notice._id)}>Delete</button>
+            <button className="btn btn-danger btn-sm" onClick={() => onDelete(notice._id, notice.title)}>Delete</button>
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import { Share2, Unlink } from 'lucide-react';
 import { identityStyle } from '../utils/identityColor';
+import { useDialog } from '../context/DialogContext';
 
 /**
  * Shown inside a section's course view (admin only). Lets the admin request
@@ -10,6 +11,7 @@ import { identityStyle } from '../utils/identityColor';
  * rejected, plus an unlink action once linked.
  */
 const MirrorRequestPanel = ({ sectionId, courseId, onLinked }) => {
+  const { confirm, toast } = useDialog();
   const [status, setStatus] = useState(null); // { requests: [], link: {...} | null }
   const [loading, setLoading] = useState(true);
   const [phone, setPhone] = useState('');
@@ -51,13 +53,19 @@ const MirrorRequestPanel = ({ sectionId, courseId, onLinked }) => {
   };
 
   const handleUnlink = async () => {
-    if (!window.confirm('Unlink this course? Files already mirrored here will stay, but new uploads from the teacher will stop showing up.')) return;
+    const ok = await confirm({
+      title: 'Unlink this course?',
+      message: 'Files already mirrored here will stay, but new uploads from the teacher will stop showing up.',
+      confirmLabel: 'Unlink course',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`/sections/${sectionId}/courses/${courseId}/mirror-link`);
       load();
       onLinked?.();
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not unlink');
+      toast.error(err.response?.data?.message || 'Could not unlink');
     }
   };
 
@@ -66,7 +74,7 @@ const MirrorRequestPanel = ({ sectionId, courseId, onLinked }) => {
       await api.delete(`${base}/${reqId}`);
       load();
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not dismiss request');
+      toast.error(err.response?.data?.message || 'Could not dismiss request');
     }
   };
 

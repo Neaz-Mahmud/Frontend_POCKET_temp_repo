@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { Folder as FolderIcon, FileText, Trash2, ArrowLeft, Download, Pencil, Search, FolderOpen, FileQuestion } from 'lucide-react';
 import PresignedUploader from './PresignedUploader';
+import { useDialog } from '../context/DialogContext';
 import './FileExplorer.css';
 
 /**
@@ -13,6 +14,8 @@ import './FileExplorer.css';
  * `endpoint` is the personal-storage base, e.g. "/personal".
  */
 const FileExplorer = ({ endpoint, mode, parentId, folderType, folderId, onFolderClick, onBack, title, maxSize }) => {
+  // `confirm` is aliased: this component already has its own upload-confirm.
+  const { confirm: askConfirm, toast } = useDialog();
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,27 +62,39 @@ const FileExplorer = ({ endpoint, mode, parentId, folderType, folderId, onFolder
       setNewFolderName('');
       fetchContents();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create folder');
+      toast.error(err.response?.data?.message || 'Failed to create folder');
     }
   };
 
-  const handleDeleteFolder = async (id) => {
-    if (!window.confirm('Delete this folder and everything inside it?')) return;
+  const handleDeleteFolder = async (id, name) => {
+    const ok = await askConfirm({
+      title: 'Delete this folder?',
+      message: `"${name}" and everything inside it will be permanently removed.`,
+      confirmLabel: 'Delete folder',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`${endpoint}/folders/${id}`);
       fetchContents();
     } catch (err) {
-      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to delete folder');
     }
   };
 
-  const handleDeleteFile = async (id) => {
-    if (!window.confirm('Delete this file?')) return;
+  const handleDeleteFile = async (id, name) => {
+    const ok = await askConfirm({
+      title: 'Delete this file?',
+      message: `"${name}" will be permanently removed from your storage.`,
+      confirmLabel: 'Delete file',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`${endpoint}/files/${id}`);
       fetchContents();
     } catch (err) {
-      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to delete file');
     }
   };
 
@@ -109,7 +124,7 @@ const FileExplorer = ({ endpoint, mode, parentId, folderType, folderId, onFolder
       setEditingId(null);
       fetchContents();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to rename folder');
+      toast.error(err.response?.data?.message || 'Failed to rename folder');
     }
   };
 
@@ -120,7 +135,7 @@ const FileExplorer = ({ endpoint, mode, parentId, folderType, folderId, onFolder
       setEditingId(null);
       fetchContents();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to rename file');
+      toast.error(err.response?.data?.message || 'Failed to rename file');
     }
   };
 
@@ -203,7 +218,7 @@ const FileExplorer = ({ endpoint, mode, parentId, folderType, folderId, onFolder
                 )}
                 <div className="item-actions">
                   <button onClick={(e) => { e.stopPropagation(); startEdit(f._id, f.name); }} className="action-btn" title="Rename"><Pencil size={15} /></button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteFolder(f._id); }} className="action-btn delete-btn">
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteFolder(f._id, f.name); }} className="action-btn delete-btn">
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -247,7 +262,7 @@ const FileExplorer = ({ endpoint, mode, parentId, folderType, folderId, onFolder
                 <a href={f.downloadUrl} target="_blank" rel="noreferrer" className="action-btn download-btn">
                   <Download size={15} />
                 </a>
-                <button onClick={() => handleDeleteFile(f._id)} className="action-btn delete-btn">
+                <button onClick={() => handleDeleteFile(f._id, f.fileName)} className="action-btn delete-btn">
                   <Trash2 size={15} />
                 </button>
               </div>

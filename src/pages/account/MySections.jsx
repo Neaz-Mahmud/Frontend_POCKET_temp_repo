@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import RequestAdminForm from '../../components/RequestAdminForm';
 import { identityStyle } from '../../utils/identityColor';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import './MySections.css';
 
@@ -41,6 +42,7 @@ const ROLE_BADGE = { admin: 'badge-ink', teacher: 'badge-sky', student: 'badge-m
  */
 const MySections = () => {
   const { user } = useAuth();
+  const { confirm, toast } = useDialog();
   const isTeacher = user?.role === 'teacher';
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -104,16 +106,21 @@ const MySections = () => {
     }
   };
 
-  const handleLeave = async (e, sectionId) => {
+  const handleLeave = async (e, sectionId, sectionName) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to leave this section?')) return;
+    const ok = await confirm({
+      title: 'Leave this Section?',
+      message: `You will lose access to the notices and materials of "${sectionName}". You can ask to rejoin with its join code later.`,
+      confirmLabel: 'Leave Section',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`/sections/${sectionId}/members/${user._id}`);
       setSections((prev) => prev.filter((s) => s._id !== sectionId));
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Failed to leave section');
+      toast.error(err.response?.data?.message || 'Failed to leave section');
     }
   };
 
@@ -128,8 +135,7 @@ const MySections = () => {
         setSections(prev => prev.filter(s => s._id !== sectionId));
       }
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Failed to process invitation');
+      toast.error(err.response?.data?.message || 'Failed to process invitation');
     }
   };
 
@@ -257,7 +263,7 @@ const MySections = () => {
                     <span className={`badge ${ROLE_BADGE[s.memberRole]}`}>{s.memberRole}</span>
                     <button
                       className="btn btn-ghost btn-sm section-card-leave"
-                      onClick={(e) => handleLeave(e, s._id)}
+                      onClick={(e) => handleLeave(e, s._id, s.name)}
                       title="Leave Section"
                       aria-label={`Leave ${s.name}`}
                     >
@@ -282,7 +288,7 @@ const MySections = () => {
                     <span className={`badge ${ROLE_BADGE[s.memberRole]}`}>{s.memberRole}</span>
                     <button
                       className="btn btn-ghost btn-sm section-card-leave"
-                      onClick={(e) => handleLeave(e, s._id)}
+                      onClick={(e) => handleLeave(e, s._id, s.name)}
                       title="Leave Section"
                       aria-label={`Leave ${s.name}`}
                     >

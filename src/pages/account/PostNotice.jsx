@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../api/axios';
 import NoticeCard from '../../components/NoticeCard';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import './PostNotice.css';
 
@@ -21,6 +22,7 @@ const emptyForm = {
 };
 
 const PostNotice = ({ sectionId }) => {
+  const { confirm, toast } = useDialog();
   const [teachers, setTeachers] = useState([]);
   const [notices, setNotices] = useState([]);
   const [loadingNotices, setLoadingNotices] = useState(true);
@@ -83,13 +85,21 @@ const PostNotice = ({ sectionId }) => {
     setForm(emptyForm);
   };
 
-  const handleDelete = async (nId) => {
-    if (!window.confirm('Delete this notice?')) return;
+  const handleDelete = async (nId, title) => {
+    const ok = await confirm({
+      title: 'Delete this notice?',
+      message: title
+        ? `"${title}" will disappear from every member's feed.`
+        : 'It will disappear from every member’s feed.',
+      confirmLabel: 'Delete notice',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`/sections/${sectionId}/notices/${nId}`);
       loadNotices();
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not delete notice');
+      toast.error(err.response?.data?.message || 'Could not delete notice');
     }
   };
 

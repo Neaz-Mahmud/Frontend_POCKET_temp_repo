@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../api/axios';
 import { Check, X, Inbox, Trash2, Search } from 'lucide-react';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import './Admin.css';
 
@@ -11,6 +12,7 @@ const fmtSize = (bytes) => {
 };
 
 const AdminSections = () => {
+  const { confirm, prompt } = useDialog();
   const [view, setView] = useState('pending'); // 'pending' | 'all'
   const [pending, setPending] = useState([]);
   const [all, setAll] = useState([]);
@@ -51,7 +53,15 @@ const AdminSections = () => {
   const decide = async (id, action) => {
     let reason;
     if (action === 'reject') {
-      reason = window.prompt('Reason for rejection (shown to the CR):', 'Section ID card is unclear.');
+      reason = await prompt({
+        title: 'Reject this verification?',
+        message: 'The CR sees this reason and can submit a new ID card afterwards.',
+        label: 'Reason for rejection',
+        defaultValue: 'Section ID card is unclear.',
+        multiline: true,
+        confirmLabel: 'Reject verification',
+        tone: 'danger',
+      });
       if (reason === null) return;
     }
     setBusyId(id);
@@ -69,7 +79,13 @@ const AdminSections = () => {
   };
 
   const removeSection = async (id, name) => {
-    if (!window.confirm(`Delete section "${name}" and ALL its content? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete "${name}"?`,
+      message: 'The Section and every semester, course and material inside it will be permanently deleted, for every member. This cannot be undone.',
+      confirmLabel: 'Delete Section',
+      tone: 'danger',
+    });
+    if (!ok) return;
     setBusyId(id);
     setMessage(null);
     try {

@@ -1,0 +1,234 @@
+/* ═══════════════════════════════════════════════════════════
+   Dialogs & toasts
+
+   Replaces the browser's native confirm/alert/prompt, which drop
+   in from the top of the viewport in an OS chrome that has nothing
+   to do with the rest of the product. Two surfaces:
+
+   · dialog — a centred, focus-trapped card for decisions the user
+     must answer (delete this, reject with a reason).
+   · toast — a bottom-right, self-dismissing note for outcomes the
+     user does not need to acknowledge (a failed request).
+
+   Both are built from the tokens in index.css, so they inherit
+   light/dark and the app's motion curve automatically.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Dialog ──────────────────────────────────────────────── */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: rgba(23, 22, 20, 0.5);
+  backdrop-filter: blur(3px);
+  animation: dialog-backdrop-in var(--dur-base) var(--ease) both;
+}
+
+[data-theme='dark'] .dialog-backdrop { background-color: rgba(0, 0, 0, 0.62); }
+
+.dialog-backdrop.is-closing { animation: dialog-backdrop-out var(--dur-fast) var(--ease) both; }
+
+.dialog-card {
+  width: 100%;
+  max-width: 430px;
+  max-height: calc(100vh - var(--space-8));
+  overflow-y: auto;
+  padding: var(--space-6);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-float);
+  /* The spring easing gives the card a slight overshoot, so it lands
+     rather than simply appearing. */
+  animation: dialog-card-in var(--dur-slow) var(--ease-spring) both;
+}
+
+.dialog-backdrop.is-closing .dialog-card { animation: dialog-card-out var(--dur-fast) var(--ease) both; }
+
+/* The tinted bubble carries the severity, so the title doesn't have
+   to shout it. Tones map onto the pastel + danger token families. */
+.dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-full);
+  background-color: var(--brand-soft);
+  color: var(--brand);
+  box-shadow: inset 0 0 0 1px var(--brand-border);
+}
+
+.dialog-icon-danger {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger-border);
+}
+.dialog-icon-success {
+  background-color: var(--success-bg);
+  color: var(--success);
+  box-shadow: inset 0 0 0 1px var(--success-border);
+}
+.dialog-icon-info {
+  background-color: var(--pastel-sky);
+  color: var(--pastel-sky-ink);
+  box-shadow: inset 0 0 0 1px rgba(23, 22, 20, 0.06);
+}
+
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.dialog-message {
+  margin-top: var(--space-2);
+  font-size: var(--text-base);
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.dialog-field { margin-top: var(--space-5); }
+.dialog-field label { display: block; margin-bottom: var(--space-2); }
+.dialog-field textarea { min-height: 88px; resize: vertical; }
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+/* On a narrow screen the buttons go full width and the primary
+   action sits on top, where the thumb already is. */
+@media (max-width: 460px) {
+  .dialog-actions { flex-direction: column-reverse; }
+  .dialog-actions .btn { width: 100%; }
+}
+
+@keyframes dialog-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dialog-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dialog-card-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes dialog-card-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(6px) scale(0.98); }
+}
+
+/* ── Toasts ──────────────────────────────────────────────── */
+.toast-stack {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(360px, calc(100vw - var(--space-8)));
+  pointer-events: none;
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  overflow: hidden;
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--muted);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-pop);
+  pointer-events: auto;
+  animation: toast-in var(--dur-base) var(--ease-spring) both;
+}
+
+.toast.is-closing { animation: toast-out var(--dur-fast) var(--ease) both; }
+
+.toast-error { border-left-color: var(--danger); }
+.toast-error .toast-icon, .toast-error .toast-timer { color: var(--danger); }
+.toast-success { border-left-color: var(--success); }
+.toast-success .toast-icon, .toast-success .toast-timer { color: var(--success); }
+.toast-info { border-left-color: var(--pastel-sky-ink); }
+.toast-info .toast-icon, .toast-info .toast-timer { color: var(--pastel-sky-ink); }
+
+.toast-icon { flex-shrink: 0; margin-top: 1px; }
+
+.toast-body { flex: 1; min-width: 0; }
+.toast-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.toast-text {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.toast-title + .toast-text { margin-top: 2px; }
+
+.toast-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: -2px -2px 0 0;
+  border-radius: var(--radius-full);
+  color: var(--muted);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.toast-close:hover { background-color: var(--paper-sunken); color: var(--ink); }
+
+/* A hairline countdown along the bottom edge — enough to show the
+   toast is going to leave on its own, quiet enough to ignore. */
+.toast-timer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left;
+  background-color: currentColor;
+  opacity: 0.35;
+  animation: toast-timer linear both;
+}
+
+@media (max-width: 560px) {
+  .toast-stack {
+    right: var(--space-3);
+    left: var(--space-3);
+    bottom: var(--space-3);
+    width: auto;
+  }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(16px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(12px) scale(0.98); }
+}
+@keyframes toast-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* The global reduced-motion rule collapses every animation to ~0ms,
+   which would make the countdown bar vanish instantly. Hide it
+   instead — the toast still dismisses itself on schedule. */
+@media (prefers-reduced-motion: reduce) {
+  .toast-timer { display: none; }
+}

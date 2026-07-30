@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import api from '../../api/axios';
 import { BookOpen, Check, X, Trash2, Plus, Upload, Inbox, Phone, Mail } from 'lucide-react';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import '../public/Public.css';
 import '../account/Profile.css';
@@ -10,6 +11,7 @@ import './Admin.css';
 const emptyNew = { title: '', author: '', price: '', description: '', stock: '', active: true };
 
 const AdminBooks = () => {
+  const { confirm, prompt, toast } = useDialog();
   const [tab, setTab] = useState('pending');
   const [message, setMessage] = useState(null);
 
@@ -40,15 +42,35 @@ const AdminBooks = () => {
 
   const moderate = async (id, action) => {
     let reason;
-    if (action === 'reject') { reason = window.prompt('Reason for rejection:', 'Does not meet listing guidelines'); if (reason === null) return; }
+    if (action === 'reject') {
+      reason = await prompt({
+        title: 'Reject this listing?',
+        message: 'The seller sees this reason, so say what needs fixing.',
+        label: 'Reason for rejection',
+        defaultValue: 'Does not meet listing guidelines',
+        multiline: true,
+        confirmLabel: 'Reject listing',
+        tone: 'danger',
+      });
+      if (reason === null) return;
+    }
     try {
       await api.post(`/books/admin/old/${id}/${action}`, action === 'reject' ? { reason } : {});
       setOldBooks((b) => b.filter((x) => x._id !== id));
     } catch (err) { setMessage({ type: 'error', text: err.response?.data?.message || 'Action failed' }); }
   };
-  const deleteOld = async (id) => {
-    if (!window.confirm('Delete this listing?')) return;
-    try { await api.delete(`/books/admin/old/${id}`); setOldBooks((b) => b.filter((x) => x._id !== id)); } catch { /* */ }
+  const deleteOld = async (id, title) => {
+    const ok = await confirm({
+      title: 'Delete this listing?',
+      message: `"${title}" will be removed from the used-book marketplace for good.`,
+      confirmLabel: 'Delete listing',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`/books/admin/old/${id}`);
+      setOldBooks((b) => b.filter((x) => x._id !== id));
+    } catch (err) { toast.error(err.response?.data?.message || 'Could not delete the listing'); }
   };
 
   const createNew = async (e) => {
@@ -71,9 +93,18 @@ const AdminBooks = () => {
   const toggleActive = async (b) => {
     try { await api.patch(`/books/admin/new/${b._id}`, { active: !b.active }); loadNew(); } catch { /* */ }
   };
-  const deleteNew = async (id) => {
-    if (!window.confirm('Delete this book?')) return;
-    try { await api.delete(`/books/admin/new/${id}`); loadNew(); } catch { /* */ }
+  const deleteNew = async (id, title) => {
+    const ok = await confirm({
+      title: 'Delete this book?',
+      message: `"${title}" will be removed from the new-book store.`,
+      confirmLabel: 'Delete book',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`/books/admin/new/${id}`);
+      loadNew();
+    } catch (err) { toast.error(err.response?.data?.message || 'Could not delete the book'); }
   };
 
   const setOrderStatus = async (id, status) => {
@@ -133,7 +164,7 @@ const AdminBooks = () => {
                       <button className="btn btn-primary btn-sm" onClick={() => moderate(b._id, 'approve')}><Check size={15} /> Approve</button>
                       <button className="btn btn-secondary btn-sm" onClick={() => moderate(b._id, 'reject')}><X size={15} /> Reject</button>
                     </>}
-                    <button className="btn btn-ghost btn-sm text-danger" onClick={() => deleteOld(b._id)}><Trash2 size={15} /> Delete</button>
+                    <button className="btn btn-ghost btn-sm text-danger" onClick={() => deleteOld(b._id, b.title)}><Trash2 size={15} /> Delete</button>
                   </div>
                 </div>
               ))}
@@ -179,7 +210,7 @@ const AdminBooks = () => {
                   </div>
                   <div className="row-actions">
                     <button className="btn btn-ghost btn-sm" onClick={() => toggleActive(b)}>{b.active ? 'Hide' : 'Show'}</button>
-                    <button className="btn btn-ghost btn-sm text-danger" onClick={() => deleteNew(b._id)}><Trash2 size={15} /></button>
+                    <button className="btn btn-ghost btn-sm text-danger" onClick={() => deleteNew(b._id, b.title)}><Trash2 size={15} /></button>
                   </div>
                 </div>
               ))}

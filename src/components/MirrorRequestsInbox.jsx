@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import { Check, X, FolderOpen } from 'lucide-react';
 import { identityStyle } from '../utils/identityColor';
+import { useDialog } from '../context/DialogContext';
 import '../styles/Panels.css';
 
 /**
@@ -11,6 +12,7 @@ import '../styles/Panels.css';
  * Share Material course folders to fulfill it with.
  */
 const MirrorRequestsInbox = ({ onCountChange }) => {
+  const { confirm } = useDialog();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
@@ -38,8 +40,16 @@ const MirrorRequestsInbox = ({ onCountChange }) => {
 
   useEffect(() => { load(); }, [load]);
 
-  const handleReject = async (id) => {
-    if (!window.confirm('Reject this request?')) return;
+  const handleReject = async (id, sectionName) => {
+    const ok = await confirm({
+      title: 'Reject this request?',
+      message: sectionName
+        ? `${sectionName} will be told you declined. They can ask again later.`
+        : 'The Section will be told you declined. They can ask again later.',
+      confirmLabel: 'Reject request',
+      tone: 'danger',
+    });
+    if (!ok) return;
     setBusy(true);
     try {
       await api.patch(`/teacher-materials/mirror-requests/${id}/reject`);
@@ -127,7 +137,7 @@ const MirrorRequestsInbox = ({ onCountChange }) => {
                   >
                     <Check size={14} /> Mirror a course
                   </button>
-                  <button className="btn btn-danger btn-sm" disabled={busy} onClick={() => handleReject(r._id)}>
+                  <button className="btn btn-danger btn-sm" disabled={busy} onClick={() => handleReject(r._id, r.section?.name)}>
                     <X size={14} /> Reject
                   </button>
                 </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../api/axios';
 import { Check, X, Inbox } from 'lucide-react';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import './Admin.css';
 
@@ -11,6 +12,7 @@ const TABS = [
 ];
 
 const AdminVerifications = () => {
+  const { prompt } = useDialog();
   const [tab, setTab] = useState('pending');
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,8 +48,16 @@ const AdminVerifications = () => {
     }
   };
 
-  const reject = async (id) => {
-    const reason = window.prompt('Reason for rejection (shown to the user):', 'ID card is unclear or does not match the profile.');
+  const reject = async (id, name) => {
+    const reason = await prompt({
+      title: name ? `Reject ${name}'s ID?` : 'Reject this ID?',
+      message: 'The reason is shown to them, and they can resubmit a new ID card.',
+      label: 'Reason for rejection',
+      defaultValue: 'ID card is unclear or does not match the profile.',
+      multiline: true,
+      confirmLabel: 'Reject ID',
+      tone: 'danger',
+    });
     if (reason === null) return;
     setBusyId(id);
     setMessage(null);
@@ -132,7 +142,7 @@ const AdminVerifications = () => {
                   <button className="btn btn-primary btn-sm" disabled={busyId === u._id} onClick={() => approve(u._id)}>
                     <Check size={15} /> Approve
                   </button>
-                  <button className="btn btn-secondary btn-sm" disabled={busyId === u._id} onClick={() => reject(u._id)}>
+                  <button className="btn btn-secondary btn-sm" disabled={busyId === u._id} onClick={() => reject(u._id, u.name)}>
                     <X size={15} /> Reject
                   </button>
                 </div>

@@ -3,6 +3,7 @@ import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import { Trash2, Search, ShieldPlus, Inbox } from 'lucide-react';
 import { identityStyle } from '../../utils/identityColor';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import './Admin.css';
 
@@ -10,6 +11,7 @@ const ROLE_FILTERS = ['all', 'student', 'teacher', 'admin'];
 
 const AdminUsers = () => {
   const { user: me } = useAuth();
+  const { confirm } = useDialog();
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState('');
   const [role, setRole] = useState('all');
@@ -38,7 +40,13 @@ const AdminUsers = () => {
   useEffect(() => { load(); }, [load]);
 
   const removeUser = async (id, name) => {
-    if (!window.confirm(`Delete "${name}" and all their files? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete ${name}?`,
+      message: 'Their account and every file they uploaded will be permanently deleted. This cannot be undone.',
+      confirmLabel: 'Delete account',
+      tone: 'danger',
+    });
+    if (!ok) return;
     setBusyId(id);
     setMessage(null);
     try {

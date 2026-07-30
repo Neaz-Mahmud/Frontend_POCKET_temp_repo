@@ -3,6 +3,7 @@ import axios from 'axios';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import { BookOpen, Upload, Trash2, Tag, X, Hourglass } from 'lucide-react';
+import { useDialog } from '../../context/DialogContext';
 import './Public.css';
 import '../account/Profile.css';
 
@@ -14,6 +15,7 @@ const daysLeft = (expiresAt) => Math.max(0, Math.ceil((new Date(expiresAt) - Dat
 
 const SellBooks = ({ meta }) => {
   const { user } = useAuth();
+  const { confirm, toast } = useDialog();
   const [form, setForm] = useState({ ...empty, contactEmail: user?.email || '', contactPhone: user?.phone || '' });
   const [photos, setPhotos] = useState([]); // [{ file, preview }] max 2
   const [submitting, setSubmitting] = useState(false);
@@ -75,12 +77,20 @@ const SellBooks = ({ meta }) => {
     }
   };
 
-  const remove = async (id) => {
-    if (!window.confirm('Delete this listing?')) return;
+  const remove = async (id, title) => {
+    const ok = await confirm({
+      title: 'Delete this listing?',
+      message: `"${title}" will be taken down and the slot freed up for another book.`,
+      confirmLabel: 'Delete listing',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`/books/old/mine/${id}`);
       loadMine();
-    } catch { /* ignore */ }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not delete the listing');
+    }
   };
 
   return (
@@ -198,7 +208,7 @@ const SellBooks = ({ meta }) => {
               <div className="row-actions">
                 {b.status === 'approved' && <button className="btn btn-ghost btn-sm" onClick={() => markSold(b._id, 'sold')}>Mark sold</button>}
                 {b.status === 'sold' && <button className="btn btn-ghost btn-sm" onClick={() => markSold(b._id, 'approved')}>Reopen</button>}
-                <button className="btn btn-ghost btn-sm text-danger" onClick={() => remove(b._id)}><Trash2 size={15} /></button>
+                <button className="btn btn-ghost btn-sm text-danger" onClick={() => remove(b._id, b.title)}><Trash2 size={15} /></button>
               </div>
             </div>
           ))}

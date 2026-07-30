@@ -267,6 +267,16 @@ button:disabled { cursor: not-allowed; opacity: 0.5; }
 .btn-danger { background-color: var(--paper); color: var(--danger); border-color: var(--danger-border); }
 .btn-danger:hover:not(:disabled) { background-color: var(--danger-bg); border-color: var(--danger); }
 
+/* The filled variant is reserved for the moment of commitment — the
+   confirm button inside a destructive dialog, never a row action. */
+.btn-danger-solid { background-color: var(--danger); color: #fff; box-shadow: var(--shadow-xs); }
+.btn-danger-solid:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(156, 63, 86, 0.2), 0 10px 20px -8px rgba(156, 63, 86, 0.45);
+}
+[data-theme='dark'] .btn-danger-solid { color: #2a1218; }
+
 .btn-sm { padding: 0.4rem 0.8rem; font-size: var(--text-sm); gap: var(--space-1); }
 
 .btn-icon {

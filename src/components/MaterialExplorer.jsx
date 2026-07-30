@@ -3,6 +3,7 @@ import api from '../api/axios';
 import { Folder as FolderIcon, FileText, Trash2, ArrowLeft, Download, Share2, Pencil, Search, FolderOpen, FileQuestion } from 'lucide-react';
 import PresignedUploader from './PresignedUploader';
 import MirrorRequestPanel from './MirrorRequestPanel';
+import { useDialog } from '../context/DialogContext';
 import './FileExplorer.css';
 
 /**
@@ -10,6 +11,7 @@ import './FileExplorer.css';
  * Read-only for regular members; when `canManage` is true, adds create/delete/upload controls.
  */
 const MaterialExplorer = ({ sectionId, canManage = false }) => {
+  const { confirm, toast } = useDialog();
   const [semester, setSemester] = useState(null);
   const [course, setCourse] = useState(null);
 
@@ -63,26 +65,56 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
       setNewName('');
       fetchLevel();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create');
+      toast.error(err.response?.data?.message || 'Failed to create');
     }
   };
 
-  const handleDeleteSemester = async (id) => {
-    if (!window.confirm('Delete this semester and everything inside it?')) return;
-    await api.delete(`${base}/semesters/${id}`);
-    fetchLevel();
+  const handleDeleteSemester = async (id, name) => {
+    const ok = await confirm({
+      title: 'Delete this semester?',
+      message: `"${name}", its courses and all their materials will be permanently removed for everyone in the Section.`,
+      confirmLabel: 'Delete semester',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`${base}/semesters/${id}`);
+      fetchLevel();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete semester');
+    }
   };
 
-  const handleDeleteCourse = async (id) => {
-    if (!window.confirm('Delete this course and its materials?')) return;
-    await api.delete(`${base}/semesters/${semester._id}/courses/${id}`);
-    fetchLevel();
+  const handleDeleteCourse = async (id, name) => {
+    const ok = await confirm({
+      title: 'Delete this course?',
+      message: `"${name}" and every material inside it will be permanently removed for everyone in the Section.`,
+      confirmLabel: 'Delete course',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`${base}/semesters/${semester._id}/courses/${id}`);
+      fetchLevel();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete course');
+    }
   };
 
-  const handleDeleteMaterial = async (id) => {
-    if (!window.confirm('Delete this material?')) return;
-    await api.delete(`${base}/courses/${course._id}/materials/${id}`);
-    fetchLevel();
+  const handleDeleteMaterial = async (id, name) => {
+    const ok = await confirm({
+      title: 'Delete this material?',
+      message: `"${name}" will be permanently removed for everyone in the Section.`,
+      confirmLabel: 'Delete material',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`${base}/courses/${course._id}/materials/${id}`);
+      fetchLevel();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete material');
+    }
   };
 
   const presign = async (file) => {
@@ -110,7 +142,7 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
       setEditingId(null);
       fetchLevel();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to rename semester');
+      toast.error(err.response?.data?.message || 'Failed to rename semester');
     }
   };
 
@@ -121,7 +153,7 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
       setEditingId(null);
       fetchLevel();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to rename course');
+      toast.error(err.response?.data?.message || 'Failed to rename course');
     }
   };
 
@@ -132,7 +164,7 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
       setEditingId(null);
       fetchLevel();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to rename material');
+      toast.error(err.response?.data?.message || 'Failed to rename material');
     }
   };
 
@@ -222,7 +254,7 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
                 {canManage && (
                   <div className="item-actions">
                     <button onClick={(e) => { e.stopPropagation(); startEdit(s._id, s.name); }} className="action-btn" title="Rename"><Pencil size={15} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); handleDeleteSemester(s._id); }} className="action-btn delete-btn">
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteSemester(s._id, s.name); }} className="action-btn delete-btn">
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -266,7 +298,7 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
                 {canManage && (
                   <div className="item-actions">
                     <button onClick={(e) => { e.stopPropagation(); startEdit(c._id, c.name); }} className="action-btn" title="Rename"><Pencil size={15} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); handleDeleteCourse(c._id); }} className="action-btn delete-btn">
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteCourse(c._id, c.name); }} className="action-btn delete-btn">
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -318,7 +350,7 @@ const MaterialExplorer = ({ sectionId, canManage = false }) => {
                   <Download size={15} />
                 </a>
                 {canManage && (
-                  <button onClick={() => handleDeleteMaterial(m._id)} className="action-btn delete-btn">
+                  <button onClick={() => handleDeleteMaterial(m._id, m.fileName)} className="action-btn delete-btn">
                     <Trash2 size={15} />
                   </button>
                 )}

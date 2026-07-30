@@ -6,6 +6,7 @@ import {
   Briefcase, Plus, Trash2, Edit2, ArrowUp, ArrowDown, Type, Image as ImageIcon,
   Video, FileUp, Inbox, ArrowLeft, Upload, Code2, Eye,
 } from 'lucide-react';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 import '../public/Public.css';
 import '../account/Profile.css';
@@ -77,6 +78,7 @@ const ReactBlockEditor = ({ block, onChange }) => {
 };
 
 const AdminJobs = () => {
+  const { confirm, toast } = useDialog();
   const [view, setView] = useState('list'); // 'list' | 'edit'
   const [posts, setPosts] = useState([]);
   const [post, setPost] = useState(emptyPost);
@@ -105,9 +107,18 @@ const AdminJobs = () => {
       setView('edit');
     } catch { setMessage({ type: 'error', text: 'Could not load post' }); }
   };
-  const removePost = async (id) => {
-    if (!window.confirm('Delete this job post?')) return;
-    try { await api.delete(`/jobs/admin/${id}`); loadList(); } catch { /* */ }
+  const removePost = async (id, position) => {
+    const ok = await confirm({
+      title: 'Delete this job post?',
+      message: position
+        ? `"${position}" will be removed from the Jobs board, along with its content blocks.`
+        : 'It will be removed from the Jobs board, along with its content blocks.',
+      confirmLabel: 'Delete post',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    try { await api.delete(`/jobs/admin/${id}`); loadList(); }
+    catch (err) { toast.error(err.response?.data?.message || 'Could not delete the post'); }
   };
 
   // ── Cover ──
@@ -182,7 +193,7 @@ const AdminJobs = () => {
                 </div>
                 <div className="row-actions">
                   <button className="btn btn-ghost btn-sm" onClick={() => startEdit(p._id)}><Edit2 size={15} /></button>
-                  <button className="btn btn-ghost btn-sm text-danger" onClick={() => removePost(p._id)}><Trash2 size={15} /></button>
+                  <button className="btn btn-ghost btn-sm text-danger" onClick={() => removePost(p._id, p.position)}><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}

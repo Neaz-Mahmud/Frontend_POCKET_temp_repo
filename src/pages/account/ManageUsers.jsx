@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { Users } from 'lucide-react';
 import api from '../../api/axios';
 import { identityStyle } from '../../utils/identityColor';
+import { useDialog } from '../../context/DialogContext';
 import '../../styles/Panels.css';
 
 const ROLE_BADGE = { admin: 'badge-ink', teacher: 'badge-sky', student: 'badge-mint' };
 
 const ManageUsers = ({ sectionId }) => {
+  const { confirm, toast } = useDialog();
   const [members, setMembers] = useState([]);
   const [counts, setCounts] = useState({});
   const [requests, setRequests] = useState([]);
@@ -43,18 +45,30 @@ const ManageUsers = ({ sectionId }) => {
       await api.patch(`/sections/${sectionId}/join-requests/${reqId}`, { decision });
       load();
     } catch (err) {
-      alert(err.response?.data?.message || 'Action failed');
+      toast.error(err.response?.data?.message || 'Action failed');
     }
   };
 
-  const handleRemove = async (userId, isCancel) => {
-    const msg = isCancel ? 'Cancel this invitation?' : 'Remove this member from the Section?';
-    if (!window.confirm(msg)) return;
+  const handleRemove = async (userId, isCancel, name) => {
+    const ok = await confirm(isCancel
+      ? {
+        title: 'Cancel this invitation?',
+        message: `${name} will no longer be able to accept it. You can invite them again later.`,
+        confirmLabel: 'Cancel invite',
+        tone: 'danger',
+      }
+      : {
+        title: `Remove ${name}?`,
+        message: 'They lose access to this Section\'s notices and materials. They can ask to rejoin with the join code.',
+        confirmLabel: 'Remove member',
+        tone: 'danger',
+      });
+    if (!ok) return;
     try {
       await api.delete(`/sections/${sectionId}/members/${userId}`);
       load();
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not remove member');
+      toast.error(err.response?.data?.message || 'Could not remove member');
     }
   };
 
@@ -167,9 +181,9 @@ const ManageUsers = ({ sectionId }) => {
               </div>
               <div className="row-actions">
                 {m.status === 'invited' ? (
-                  <button className="btn btn-secondary btn-sm" onClick={() => handleRemove(m.user._id, true)}>Cancel Invite</button>
+                  <button className="btn btn-secondary btn-sm" onClick={() => handleRemove(m.user._id, true, m.user?.name)}>Cancel Invite</button>
                 ) : (
-                  <button className="btn btn-danger btn-sm" onClick={() => handleRemove(m.user._id, false)}>Remove</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleRemove(m.user._id, false, m.user?.name)}>Remove</button>
                 )}
               </div>
             </div>

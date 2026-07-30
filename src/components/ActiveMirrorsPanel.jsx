@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import { Link2, Trash2 } from 'lucide-react';
+import { useDialog } from '../context/DialogContext';
 import '../styles/Panels.css';
 
 const ActiveMirrorsPanel = ({ folderId }) => {
+  const { confirm, toast } = useDialog();
   const [mirrors, setMirrors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,13 +29,18 @@ const ActiveMirrorsPanel = ({ folderId }) => {
   }, [fetchMirrors]);
 
   const handleUnlink = async (mirrorId, sectionName, courseName) => {
-    if (!window.confirm(`Stop mirroring to ${sectionName} / ${courseName}?`)) return;
+    const ok = await confirm({
+      title: 'Stop mirroring this folder?',
+      message: `${sectionName} / ${courseName} will stop receiving your new uploads. Files already mirrored there stay.`,
+      confirmLabel: 'Stop mirroring',
+      tone: 'danger',
+    });
+    if (!ok) return;
     try {
       await api.delete(`/teacher-materials/mirrors/${mirrorId}`);
       fetchMirrors();
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Failed to unlink mirror');
+      toast.error(err.response?.data?.message || 'Failed to unlink mirror');
     }
   };
 
