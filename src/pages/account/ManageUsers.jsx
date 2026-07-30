@@ -159,7 +159,10 @@ const ManageUsers = ({ sectionId }) => {
                 <div className="member-sub">{m.user?.email}</div>
               </div>
               <div className="member-role-badges">
-                <span className={`badge ${ROLE_BADGE[m.role]}`}>{m.role}</span>
+                {/* Teachers count as both teacher and admin — server sends `roles`. */}
+                {(m.roles?.length ? m.roles : [m.role]).map((r) => (
+                  <span key={r} className={`badge ${ROLE_BADGE[r]}`}>{r}</span>
+                ))}
                 {m.status === 'invited' && <span className="badge badge-muted">Invited</span>}
               </div>
               <div className="row-actions">
